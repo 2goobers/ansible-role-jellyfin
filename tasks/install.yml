@@ -1,41 +1,57 @@
 ---
-- name: Install apt-transport-https and gpg
-  apt:
-    name:
-      - apt-transport-https
-      - gnupg2  # required for Ansible's apt_key module
-    state: present
-  register: apt_result
-  retries: 3
-  until: apt_result is succeeded
+- name: Install with APT
+  block:
+    - name: Install apt-transport-https and gpg
+      apt:
+        name:
+        - apt-transport-https
+        - gnupg2  # required for Ansible's apt_key module
+        state: present
+      register: apt_result
+      retries: 3
+      until: apt_result is succeeded
 
-- name: Import Jellyfin Team GPG key
-  apt_key:
-    url: https://repo.jellyfin.org/debian/jellyfin_team.gpg.key
-    state: present
-  register: apt_key_result
-  retries: 3
-  until: apt_key_result is succeeded
+    - name: Import Jellyfin Team GPG key
+      apt_key:
+        url: https://repo.jellyfin.org/debian/jellyfin_team.gpg.key
+        state: present
+      register: apt_key_result
+      retries: 3
+      until: apt_key_result is succeeded
 
-- name: Add Jellyfin repository
-  apt_repository:
-    repo: >
-      deb https://repo.jellyfin.org/{{ ansible_distribution | lower }}
-      {{ ansible_distribution_release }} main
-    state: present
+    - name: Add Jellyfin repository
+      apt_repository:
+        repo: >
+          deb https://repo.jellyfin.org/{{ ansible_distribution | lower }}
+          {{ ansible_distribution_release }} main
+        state: present
 
-- name: Install Jellyfin and {{ jellyfin_HTTP_server }}
-  apt:
-    update_cache: true
-    name:
-      - jellyfin
-      - "{{ jellyfin_HTTP_server }}"
-      # required for Ansible's xml module
-      - python{{ "3" if ansible_python.version.major == 3 }}-lxml
-    state: present
-  register: apt_result
-  retries: 3
-  until: apt_result is succeeded
+    - name: Install Jellyfin and {{ jellyfin_HTTP_server }}
+      apt:
+        update_cache: true
+        name:
+          - jellyfin
+          - "{{ jellyfin_HTTP_server }}"
+          # required for Ansible's xml module
+          - python{{ "3" if ansible_python.version.major == 3 }}-lxml
+        state: present
+      register: apt_result
+      retries: 3
+      until: apt_result is succeeded
+  when: ansible_os_family == 'Debian'
+
+- name: Install with YUM
+  block:
+    - name: Install Jellyfin and {{ jellyfin_HTTP_server }}
+      yum:
+        update_cache: yes
+        name:
+          - https://repo.jellyfin.org/releases/server/centos/jellyfin-{{ jellyfin_version }}-1.el7.x86_64.rpm
+          - "{{ jellyfin_HTTP_server"
+          - python{{ "3" if ansible_python.version.major == 3 }}-lxml
+        state: present
+      retries: 3
+  when: ansible_os_family == "RedHat"
 
 - name: Enable Jellyfin and {{ jellyfin_HTTP_server }}
   systemd:

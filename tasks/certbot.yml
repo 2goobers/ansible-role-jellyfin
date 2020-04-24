@@ -1,11 +1,19 @@
 ---
-- name: Install certbot
+- name: Install certbot (APT)
   apt:
     name: certbot
     state: present
   register: apt_result
   retries: 3
   until: apt_result is succeeded
+  when: ansible_os_family == "Debian"
+
+- name: Install certbot (YUM)
+  yum:
+    name: certbot
+    state: present
+    retries: 3
+  when: ansible_os_family == "RedHat"
 
 - name: Create certbot webroot directory
   file:
