@@ -47,7 +47,7 @@
         update_cache: yes
         name:
           - https://repo.jellyfin.org/releases/server/centos/jellyfin-{{ jellyfin_version }}-1.el7.x86_64.rpm
-          - "{{ jellyfin_HTTP_server"
+          - "{{ jellyfin_HTTP_server }}"
           - python{{ "3" if ansible_python.version.major == 3 }}-lxml
         state: present
       retries: 3
