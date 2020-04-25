@@ -51,6 +51,7 @@
           - python{{ "3" if ansible_python.version.major == 3 }}-lxml
         state: present
       retries: 3
+      become: yes
   when: ansible_os_family == "RedHat"
 
 - name: Enable Jellyfin and {{ jellyfin_HTTP_server }}
