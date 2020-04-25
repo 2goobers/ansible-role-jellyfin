@@ -26,6 +26,7 @@ None.
 * `jellyfin_letsencrypt_email`: email to use when registering with Let's encrypt
 * `jellyfin_remove_default`: set this to `true` to remove apache2/nginx default
   site
+* `jellyfin_version`: version of jellyfin to install if installing on RPM based system
 
 # Dependencies
 
